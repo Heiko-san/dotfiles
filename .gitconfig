@@ -1,0 +1,30 @@
+[user]
+    email = hfi@boreus.de
+    name = Heiko Finzel
+[push]
+    default = simple
+[color]
+    branch = auto
+    diff = auto
+    interactive = auto
+    status = auto
+    ui = auto
+[alias]
+    st = status
+    cm = commit -am
+    co = checkout
+    bs = checkout stable
+    bm = checkout master
+    mm = merge master
+    changes=diff --name-status -r
+    br = branch
+    hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+    l = log --stat
+
+[log]
+    date = iso
+[branch]
+    autosetuprebase = always
+[credential]
+    helper = !aws codecommit credential-helper $@
+    UseHttpPath = true
