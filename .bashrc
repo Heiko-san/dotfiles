@@ -1,6 +1,10 @@
 # source original ~/.bashrc
 [ -r ~/.bashrc ] && source ~/.bashrc
 
+# ensure presence of some basic vars
+export HOSTNAME=$(hostname)
+export USER=$(whoami)
+
 # own bash additions
 [ -r $BOREUS_ENV/.bashrc_local ] && source $BOREUS_ENV/.bashrc_local
 [ -r $BOREUS_ENV/.bash_aliases ] && source $BOREUS_ENV/.bash_aliases
@@ -12,9 +16,5 @@ if [ -r $BOREUS_ENV/.vimrc ]; then
 fi
 [ -r $BOREUS_ENV/.gitconfig ] && alias git="HOME=$BOREUS_ENV git"
 
-# switch user and keep env additions (root only)
-if [[ ${EUID} == 0 ]] ; then
-    function become {
-        sudo -u $1 -i bash --rcfile $BOREUS_ENV/.bashrc
-    }
-fi
+# user specific env
+[ -r ${BOREUS_ENV}/users/${USER}.sh ] && source ${BOREUS_ENV}/users/${USER}.sh

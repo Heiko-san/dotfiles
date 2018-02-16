@@ -1,4 +1,11 @@
-HOSTNAME=$(hostname)
+# lang
+export LANG=de_DE.UTF-8
+export LC_COLLATE=de_DE.UTF-8
+unset LC_ALL
+unset NLS_LANG
+
+# editors
+export EDITOR=/usr/bin/vim
 
 # export EC2 instance tags, cache them 7 days
 TAGSSCRIPT="/usr/local/bin/mytags"
