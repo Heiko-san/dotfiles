@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd $BOREUS_ENV
+git pull

@@ -7,6 +7,9 @@ unset NLS_LANG
 # editors
 export EDITOR=/usr/bin/vim
 
+# personal bin path
+export PATH="$BOREUS_ENV/bin:$PATH"
+
 # export EC2 instance tags, cache them 7 days
 TAGSSCRIPT="/usr/local/bin/mytags"
 if [ -x $TAGSSCRIPT ]; then
