@@ -1,10 +1,22 @@
-# prompt
+HOSTNAME=$(hostname)
+
+# stage
+if [ -z "$STAGE" ]; then
+    STAGE="prod"
+    [[ $HOSTNAME =~ -(stage|int)- ]] && STAGE="int"
+    [[ $HOSTNAME =~ -(test|testing)- ]] && STAGE="test"
+    export STAGE
+fi
+
+# prompt 
 RED="\033[01;31m"
 GREEN="\033[01;32m"
 YELLOW="\033[01;33m"
 BLUE="\033[01;34m"
 COLOROFF="\033[m"
 HOSTCOLOR=$RED
+[ "$STAGE" == "int" ] && HOSTCOLOR=$YELLOW
+[ "$STAGE" == "test" ] && HOSTCOLOR=$GREEN
 if [[ ${EUID} == 0 ]] ; then
     PS1="\$? \[${RED}\]\u\[${BLUE}\]@\[${HOSTCOLOR}\]\h\[${BLUE}\] \w \[${COLOROFF}\]\$ "
 else
