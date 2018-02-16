@@ -1,10 +1,24 @@
 HOSTNAME=$(hostname)
 
+# export EC2 instance tags, cache them 1 day
+TAGSSCRIPT="/usr/local/bin/mytags"
+if [ -x $TAGSSCRIPT ]; then
+    TAGSFILE="$BOREUS_ENV/.cache_tags"
+    if [ ! -r $TAGSFILE ] || test $(find $TAGSFILE -mtime +1); then
+        $TAGSSCRIPT | sed "s/^/export 'TAG_/;s/$/'/" >$TAGSFILE
+    fi
+    source $TAGSFILE
+fi
+
 # stage
 if [ -z "$STAGE" ]; then
-    STAGE="prod"
-    [[ $HOSTNAME =~ -(stage|int)- ]] && STAGE="int"
-    [[ $HOSTNAME =~ -(test|testing)- ]] && STAGE="test"
+    if [ -n "$TAG_Stage" ]; then
+        STAGE=$TAG_Stage
+    else
+        STAGE="prod"
+        [[ $HOSTNAME =~ -(stage|int)- ]] && STAGE="int"
+        [[ $HOSTNAME =~ -(test|testing)- ]] && STAGE="test"
+    fi
     export STAGE
 fi
 
