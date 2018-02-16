@@ -1,10 +1,10 @@
 HOSTNAME=$(hostname)
 
-# export EC2 instance tags, cache them 1 day
+# export EC2 instance tags, cache them 7 days
 TAGSSCRIPT="/usr/local/bin/mytags"
 if [ -x $TAGSSCRIPT ]; then
     TAGSFILE="$BOREUS_ENV/.cache_tags"
-    if [ ! -r $TAGSFILE ] || test $(find $TAGSFILE -mtime +1); then
+    if [ ! -r $TAGSFILE ] || test $(find $TAGSFILE -mtime +7); then
         $TAGSSCRIPT | sed "s/^/export 'TAG_/;s/$/'/" >$TAGSFILE
     fi
     source $TAGSFILE
