@@ -1,7 +1,14 @@
 # switch user and keep env additions
 function become {
-    sudo -u $1 -i bash --rcfile $BOREUS_ENV/.bashrc
+    sudo -u $1 -i BOREUS_ENV=$BOREUS_ENV bash --rcfile $BOREUS_ENV/.bashrc
 }
+
+# histories dir
+if [ ! -d $BOREUS_ENV/var/hist ]; then
+    mkdir -p $BOREUS_ENV/var/hist
+    # allow histories for all users
+    chmod 777 $BOREUS_ENV/var/hist
+fi
 
 # stasi
 alias last='last -win 40'

@@ -10,6 +10,12 @@ export EDITOR=/usr/bin/vim
 # personal bin path
 export PATH="$BOREUS_ENV/bin:$PATH"
 
+# history settings
+export HISTFILE="$BOREUS_ENV/var/hist/${USER}.$(date +%Y-%m-%d)"
+export HISTCONTROL=ignoredups
+export HISTSIZE=1000000
+export HISTTIMEFORMAT="%F %T "
+
 # export EC2 instance tags, cache them 7 days
 TAGSSCRIPT="/usr/local/bin/mytags"
 if [ -x $TAGSSCRIPT ]; then
@@ -46,3 +52,4 @@ if [[ ${EUID} == 0 ]] ; then
 else
     PS1="\$? \[${GREEN}\]\u\[${BLUE}\]@\[${HOSTCOLOR}\]\h\[${BLUE}\] \w \[${COLOROFF}\]\$ "
 fi
+export PROMPT_COMMAND="history -a"
