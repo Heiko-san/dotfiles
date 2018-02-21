@@ -6,6 +6,7 @@ export HOSTNAME=$(hostname)
 export USER=$(whoami)
 
 # alternative home
+export ORIGINAL_HOME=$HOME
 export HOME=$BOREUS_ENV
 
 # own bash additions
