@@ -17,10 +17,18 @@ import os
 import sys
 import pwd
 
-# become oracle fo<tab>
+# become oracle fo<tab><tab>
 CMD = sys.argv[1] # become
 CUR = sys.argv[2] # fo
 PREV = sys.argv[3] # oracle
+# https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html
+COMP_LINE = os.environ["COMP_LINE"] # become oracle fo
+COMP_POINT = int(os.environ["COMP_POINT"]) # =len(COMP_LINE)
+# completion mode
+COMP_TYPE = int(os.environ["COMP_TYPE"]) # 63 on <tab><tab>, 9 on <tab>, ...
+# final key
+COMP_KEY = int(os.environ["COMP_KEY"]) # 9 on <tab>
+
 VALID_SHELLS = [
     "/bin/sh",
     "/bin/bash",
@@ -31,6 +39,7 @@ VALID_SHELLS = [
     "/bin/zsh",
     "/usr/bin/tmux",
 ]
+
 
 def reduce_options(options):
     """only keep those options beginning with CUR"""
