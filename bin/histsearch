@@ -1,0 +1,147 @@
+#!/usr/bin/env python
+
+import os
+import re
+import argparse
+import time
+
+SCRIPTNAME = os.path.basename(__file__)
+TIMESTAMP_RE = re.compile(r"^#\d+$")
+ORIG_HIST = os.path.join(os.environ["ORIGINAL_HOME"], ".bash_history")
+HIST_DIR = os.path.join(os.environ["HOME"], "var", "hist")
+
+
+def load_hist_entries(filename, data):
+    """load a given history file"""
+    with open(filename, "r") as fh:
+        timestamp = "0" 
+        if timestamp not in data:
+            data[timestamp] = list()
+        for line in fh.readlines():
+            line = line.strip()
+            if TIMESTAMP_RE.match(line):
+                timestamp = int(line[1:])
+                if timestamp not in data:
+                    data[timestamp] = list()
+            else:
+                data[timestamp].append(line)
+
+
+def load_data(all_users=False, original=False):
+    """load all history files according to options"""
+    data = dict()
+    for filename in os.listdir(HIST_DIR):
+        if all_users or filename.startswith(os.environ["USER"] + "."):
+            load_hist_entries(os.path.join(HIST_DIR, filename), data)
+    if original:
+        load_hist_entries(ORIG_HIST, data)
+    return data
+
+
+def dedup_entries(data):
+    """only keep the latest version of each command"""
+    seen = set()
+    data2 = dict()
+    for timestamp in sorted(data, key=int, reverse=True):
+        for entry in data[timestamp]:
+            if entry not in seen:
+                if timestamp not in data2:
+                    data2[timestamp] = list()
+                data2[timestamp].append(entry)
+                seen.add(entry)
+    return data2        
+
+
+def matches_search(entry, searchterms):
+    """check 1 entry against searchterms"""
+    if entry.startswith(SCRIPTNAME + " "):
+        return False
+    for token in searchterms:
+        if token.startswith("re:"):
+            token = token[3:]
+            if not re.search(token, entry):
+                return False
+        elif token not in entry:
+            return False
+    return True
+        
+
+def filter_entries(data, searchterms):
+    """filter all entries by searchterms"""
+    data2 = dict()
+    for timestamp in data:
+        for entry in data[timestamp]:
+            if matches_search(entry, searchterms):
+                if timestamp not in data2:
+                    data2[timestamp] = list()
+                data2[timestamp].append(entry)
+    return data2
+
+
+def get_start_timestamp(timespan):
+    """unix timestamp to start search"""
+    now = int(time.time())
+    unit = "d"
+    if timespan.isdigit():
+        span = int(timespan)
+    else:
+        unit = timespan[-1]
+        span = int(timespan[:-1])
+    delta = 0
+    if unit == "w":
+        delta = span * 604800
+    elif unit == "d":
+        delta = span * 86400
+    elif unit == "h":
+        delta = span * 3600
+    elif unit == "m":
+        delta = span * 60
+    return now - delta    
+
+
+def time_filter(data, timespan):
+    """filter entries by timestamp"""
+    startsearch = get_start_timestamp(timespan)
+    data2 = dict()
+    for timestamp in data:
+        if timestamp > startsearch:
+            data2[timestamp] = data[timestamp]
+    return data2
+
+def data_to_list(data):
+    data2 = list()
+    for timestamp in sorted(data, key=int):
+        for entry in data[timestamp]:
+            data2.append(entry)
+    return data2
+
+def main():
+    parser = argparse.ArgumentParser(description=('Search history.'
+            ' All given search tokens must be present in target lines.'
+            ' If a token starts with "re:" it is considered to be a regex.'),
+            epilog=('Example: histsearch monitoring "re:^salt\s+[\\"\']\*'
+            '[\\"\']\s+state.apply"'))
+    parser.add_argument("-t", "--timespan",
+        help="only search timespan days into the past (2w, 5d, 3h, 35m)")
+    parser.add_argument("-o", "--include-original", action="store_true",
+        help="include the original user history (e.g. /root/.bash_history)")
+    parser.add_argument("-a", "--include-all", action="store_true",
+        help="include all own user histories (not only current user)")
+    parser.add_argument("-s", "--sort", action="store_true",
+        help=("sort by alphabetical commands instead of time the command was"
+              " entered"))
+    args, searchterms = parser.parse_known_args()
+    data = load_data(args.include_all, args.include_original)
+    data = dedup_entries(data)
+    if args.timespan:
+        data = time_filter(data, args.timespan)
+    data = filter_entries(data, searchterms)
+    data = data_to_list(data)
+    if args.sort:
+        data = sorted(data)
+    for entry in data:
+        print(entry)
+
+
+if __name__ == "__main__":
+    main()
