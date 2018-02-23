@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+"""
+_become()                                                                       
+{                                                                               
+    local cur prev opts                                                         
+    COMPREPLY=()                                                                
+    cur="${COMP_WORDS[COMP_CWORD]}"                                             
+    prev="${COMP_WORDS[COMP_CWORD-1]}"                                          
+    opts=$(cut -d: -f1 /etc/passwd)
+                                                                                
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )                             
+    return 0                                                                    
+}
+complete -F _become become
+"""
+import os
+import sys
+import pwd
+
+# become oracle fo<tab>
+CMD = sys.argv[1] # become
+CUR = sys.argv[2] # fo
+PREV = sys.argv[3] # oracle
+VALID_SHELLS = [
+    "/bin/sh",
+    "/bin/bash",
+    "/usr/bin/sh",
+    "/usr/bin/bash",
+    "/bin/ksh",
+    "/bin/rksh",
+    "/bin/zsh",
+    "/usr/bin/tmux",
+]
+
+def reduce_options(options):
+    """only keep those options beginning with CUR"""
+    opts = list()
+    for opt in options:
+        if opt.startswith(CUR):
+            opts.append(opt)
+    return opts
+
+
+def user_valid(user):
+    """only suggest users with a login shell and an existing home"""
+    if user.pw_shell not in VALID_SHELLS:
+        return False
+    if not os.path.isdir(user.pw_dir):
+        return False
+    return True
+
+
+def get_users():
+    """generate a list of valid users on this machine"""
+    return [x.pw_name for x in pwd.getpwall() if user_valid(x)]
+
+
+def main():
+    options = list()
+    options = get_users()
+    options = reduce_options(options)
+    print("\n".join(options))
+
+
+if __name__ == "__main__":
+    main()

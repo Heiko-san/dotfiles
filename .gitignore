@@ -2,3 +2,4 @@
 .viminfo
 .lesshst
 var/*
+.vim/.*
