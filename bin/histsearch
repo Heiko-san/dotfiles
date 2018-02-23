@@ -150,7 +150,8 @@ def main():
     for entry in data:
         if args.with_time: 
             ts = datetime.fromtimestamp(entry[1], tz=LOCAL_TIMEZONE)
-            print("{0} | {1}".format(ts.strftime("%d/%m/%y %H:%M:%S"), entry[0]))
+            print("{0}   {1}".format(ts.strftime(
+                "%a %d/%m/%y %H:%M:%S"), entry[0]))
         else:
             print(entry[0])
 
