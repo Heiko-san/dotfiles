@@ -4,7 +4,10 @@ import os
 import re
 import argparse
 import time
+from datetime import datetime
+from dateutil import tz
 
+LOCAL_TIMEZONE = tz.tzlocal()
 SCRIPTNAME = os.path.basename(__file__)
 TIMESTAMP_RE = re.compile(r"^#\d+$")
 ORIG_HIST = os.path.join(os.environ["ORIGINAL_HOME"], ".bash_history")
@@ -54,7 +57,7 @@ def dedup_entries(data):
 
 def matches_search(entry, searchterms):
     """check 1 entry against searchterms"""
-    if entry.startswith(SCRIPTNAME + " "):
+    if entry.startswith(SCRIPTNAME):
         return False
     for token in searchterms:
         if token.startswith("re:"):
@@ -108,11 +111,13 @@ def time_filter(data, timespan):
             data2[timestamp] = data[timestamp]
     return data2
 
-def data_to_list(data):
+def data_to_list(data, sort):
     data2 = list()
     for timestamp in sorted(data, key=int):
         for entry in data[timestamp]:
-            data2.append(entry)
+            data2.append((entry, timestamp))
+    if sort:
+        data2 = sorted(data2)
     return data2
 
 def main():
@@ -121,26 +126,33 @@ def main():
             ' If a token starts with "re:" it is considered to be a regex.'),
             epilog=('Example: histsearch monitoring "re:^salt\s+[\\"\']\*'
             '[\\"\']\s+state.apply"'))
-    parser.add_argument("-t", "--timespan",
-        help="only search timespan days into the past (2w, 5d, 3h, 35m)")
-    parser.add_argument("-o", "--include-original", action="store_true",
-        help="include the original user history (e.g. /root/.bash_history)")
     parser.add_argument("-a", "--include-all", action="store_true",
         help="include all own user histories (not only current user)")
+    parser.add_argument("-d", "--deduplicate", action="store_true",
+        help="deduplicate commands and only keep the latest execution")
+    parser.add_argument("-o", "--include-original", action="store_true",
+        help="include the original user history (e.g. /root/.bash_history)")
     parser.add_argument("-s", "--sort", action="store_true",
         help=("sort by alphabetical commands instead of time the command was"
               " entered"))
+    parser.add_argument("-t", "--timespan",
+        help="only search timespan days into the past (2w, 5d, 3h, 35m)")
+    parser.add_argument("-w", "--with-time", action="store_true",
+        help="also output execution time (in local timezone)")
     args, searchterms = parser.parse_known_args()
     data = load_data(args.include_all, args.include_original)
-    data = dedup_entries(data)
+    if args.deduplicate:
+        data = dedup_entries(data)
     if args.timespan:
         data = time_filter(data, args.timespan)
     data = filter_entries(data, searchterms)
-    data = data_to_list(data)
-    if args.sort:
-        data = sorted(data)
+    data = data_to_list(data, args.sort)
     for entry in data:
-        print(entry)
+        if args.with_time: 
+            ts = datetime.fromtimestamp(entry[1], tz=LOCAL_TIMEZONE)
+            print("{0} | {1}".format(ts.strftime("%d/%m/%y %H:%M:%S"), entry[0]))
+        else:
+            print(entry[0])
 
 
 if __name__ == "__main__":
