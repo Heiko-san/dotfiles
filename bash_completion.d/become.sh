@@ -1,1 +1,1 @@
-complete -C ${BOREUS_ENV}/bash_completion.d/become become
+complete -C "python ${BOREUS_ENV}/bash_completion.d/become" become

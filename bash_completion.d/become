@@ -43,6 +43,8 @@ def reduce_options(options):
 
 def user_valid(user):
     """only suggest users with a login shell and an existing home"""
+    if user.pw_name == os.environ["USER"]:
+        return False
     if user.pw_shell not in VALID_SHELLS:
         return False
     if not os.path.isdir(user.pw_dir):
