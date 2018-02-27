@@ -1,3 +1,4 @@
+escape ^Aa # use the default escape key
 startup_message  off   # Keine Willkommensnachricht
 vbell            off   # Kein visuelles Blinken
 defutf8          on    # utf8 bei neuen fenstern
