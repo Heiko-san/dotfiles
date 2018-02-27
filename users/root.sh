@@ -6,9 +6,13 @@ function become {
 # histories dir
 if [ ! -d $BOREUS_ENV/var/hist ]; then
     mkdir -p $BOREUS_ENV/var/hist
-    # allow histories for all users
-    chmod 777 $BOREUS_ENV/var/hist
 fi
+if [ ! -d $BOREUS_ENV/var/tmp ]; then
+    mkdir -p $BOREUS_ENV/var/tmp
+fi
+# allow histories for all users
+chmod 1777 $BOREUS_ENV/var/hist
+chmod 1777 $BOREUS_ENV/var/tmp
 
 # stasi
 alias last='last -win 40'
