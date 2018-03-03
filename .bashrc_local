@@ -1,3 +1,4 @@
+#@IgnoreInspection BashAddShebang
 # lang
 export LANG=de_DE.UTF-8
 export LC_COLLATE=de_DE.UTF-8
@@ -38,7 +39,7 @@ if [ -z "$STAGE" ]; then
     export STAGE
 fi
 
-# prompt 
+# prompt
 RED="\033[01;31m"
 GREEN="\033[01;32m"
 YELLOW="\033[01;33m"

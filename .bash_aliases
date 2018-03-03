@@ -1,3 +1,4 @@
+#@IgnoreInspection BashAddShebang
 # aiming assistance
 alias ll="ls -Alh --color=auto"
 alias öö="ll"

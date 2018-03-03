@@ -1,3 +1,4 @@
+#@IgnoreInspection BashAddShebang
 # fix deeper shell levels (e.g. screen)
 [ -n "$ORIGINAL_HOME" ] && export HOME=$ORIGINAL_HOME
 
