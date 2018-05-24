@@ -1,17 +1,10 @@
 #@IgnoreInspection BashAddShebang
-# fix deeper shell levels (e.g. screen)
-[ -n "$ORIGINAL_HOME" ] && export HOME=$ORIGINAL_HOME
-
 # source original ~/.bashrc
 [ -r ~/.bashrc ] && source ~/.bashrc
 
 # ensure presence of some basic vars
 export HOSTNAME=$(hostname)
 export USER=$(whoami)
-
-# alternative home
-export ORIGINAL_HOME=$HOME
-export HOME=$BOREUS_ENV
 
 # own bash additions
 [ -r $BOREUS_ENV/.bashrc_local ] && source $BOREUS_ENV/.bashrc_local

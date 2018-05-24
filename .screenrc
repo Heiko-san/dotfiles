@@ -5,6 +5,6 @@ defutf8          on    # utf8 bei neuen fenstern
 utf8             on
 autodetach       on    # on = default
 shelltitle   'bash'    # Fenstertitel
-hardcopydir $HOME/var/tmp # Screenshots ins Homeverzeichnis
+hardcopydir $BOREUS_ENV/var/tmp # Screenshots ins Homeverzeichnis
 defscrollback 10000    # Buffer
 defmonitor off         # Aktivitäten nicht in Fenstertitel schreiben
