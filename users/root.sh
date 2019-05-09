@@ -4,15 +4,15 @@ function become {
 }
 
 # histories dir
-if [ ! -d $BOREUS_ENV/var/hist ]; then
-    mkdir -p $BOREUS_ENV/var/hist
+if [ ! -d $VAR_DIRECTORY/hist ]; then
+    mkdir -p $VAR_DIRECTORY/hist
 fi
-if [ ! -d $BOREUS_ENV/var/tmp ]; then
-    mkdir -p $BOREUS_ENV/var/tmp
+if [ ! -d $VAR_DIRECTORY/tmp ]; then
+    mkdir -p $VAR_DIRECTORY/tmp
 fi
 # allow histories for all users
-chmod 1777 $BOREUS_ENV/var/hist
-chmod 1777 $BOREUS_ENV/var/tmp
+chmod 1777 $VAR_DIRECTORY/hist
+chmod 1777 $VAR_DIRECTORY/tmp
 
 # stasi
 alias last='last -win 40'

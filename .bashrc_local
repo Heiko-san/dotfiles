@@ -12,7 +12,10 @@ export EDITOR=/usr/bin/vim
 export PATH="$BOREUS_ENV/bin:$PATH"
 
 # history settings
-export HISTFILE="$BOREUS_ENV/var/hist/${USER}.$(date +%Y-%m-%d)"
+if [ -z "$VAR_DIRECTORY" ]; then
+    export VAR_DIRECTORY="$BOREUS_ENV/var"
+fi
+export HISTFILE="$VAR_DIRECTORY/hist/${USER}.$(date +%Y-%m-%d)"
 export HISTCONTROL=ignoredups
 export HISTSIZE=1000000
 export HISTTIMEFORMAT="%F %T "

@@ -11,7 +11,7 @@ LOCAL_TIMEZONE = tz.tzlocal()
 SCRIPTNAME = os.path.basename(__file__)
 TIMESTAMP_RE = re.compile(r"^#\d+$")
 ORIG_HIST = os.path.join(os.environ["HOME"], ".bash_history")
-HIST_DIR = os.path.join(os.environ["BOREUS_ENV"], "var", "hist")
+HIST_DIR = os.path.join(os.environ["VAR_DIRECTORY"], "hist")
 
 
 def load_hist_entries(filename, data):
