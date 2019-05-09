@@ -20,6 +20,12 @@ export HISTCONTROL=ignoredups
 export HISTSIZE=1000000
 export HISTTIMEFORMAT="%F %T "
 
+# git commits
+export GIT_AUTHOR_NAME='Heiko Finzel'
+export GIT_COMMITTER_NAME='Heiko Finzel'
+export GIT_AUTHOR_EMAIL='hfi@boreus.de'
+export GIT_COMMITTER_EMAIL='hfi@boreus.de'
+
 # export EC2 instance tags, cache them 7 days
 TAGSSCRIPT="/usr/local/bin/mytags"
 if [ -x $TAGSSCRIPT ]; then
