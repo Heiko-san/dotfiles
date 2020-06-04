@@ -1,6 +1,9 @@
 #@IgnoreInspection BashAddShebang
 # source original ~/.bashrc
-[ -r ~/.bashrc ] && source ~/.bashrc
+
+if [ "$1" != "skip" ]; then
+    [ -r ~/.bashrc ] && source ~/.bashrc
+fi
 
 # ensure presence of some basic vars
 export HOSTNAME=$(hostname)
@@ -15,3 +18,8 @@ export USER=$(whoami)
 
 # user specific env
 [ -r ${BOREUS_ENV}/users/${USER}.sh ] && source ${BOREUS_ENV}/users/${USER}.sh
+
+
+function become {
+    sudo -u $1 -i BOREUS_ENV=$BOREUS_ENV bash --rcfile $BOREUS_ENV/.bashrc
+}
