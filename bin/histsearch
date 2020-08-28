@@ -17,7 +17,10 @@ HIST_DIR = os.path.join(os.environ["VAR_DIRECTORY"], "hist")
 def load_hist_entries(filename, data):
     """load a given history file"""
     with open(filename, "r") as fh:
-        timestamp = "0" 
+        # fallback 01/01/70 for entries without timestamp on top of history
+        # = before HISTTIMEFORMAT
+        # later entries are placed at timestamp of predecessor
+        timestamp = 0
         if timestamp not in data:
             data[timestamp] = list()
         for line in fh.readlines():
@@ -52,7 +55,7 @@ def dedup_entries(data):
                     data2[timestamp] = list()
                 data2[timestamp].append(entry)
                 seen.add(entry)
-    return data2        
+    return data2
 
 
 def matches_search(entry, searchterms):
@@ -60,14 +63,14 @@ def matches_search(entry, searchterms):
     if entry.startswith(SCRIPTNAME):
         return False
     for token in searchterms:
-        if token.startswith("re:"):
+        if token.startswith("r:"):
             token = token[3:]
             if not re.search(token, entry):
                 return False
         elif token not in entry:
             return False
     return True
-        
+
 
 def filter_entries(data, searchterms):
     """filter all entries by searchterms"""
@@ -99,7 +102,7 @@ def get_start_timestamp(timespan):
         delta = span * 3600
     elif unit == "m":
         delta = span * 60
-    return now - delta    
+    return now - delta
 
 
 def time_filter(data, timespan):
@@ -120,11 +123,12 @@ def data_to_list(data, sort):
         data2 = sorted(data2)
     return data2
 
-def main():
+# SNIPPET python : argparse with left-overs
+def parse_args():
     parser = argparse.ArgumentParser(description=('Search history.'
             ' All given search tokens must be present in target lines.'
-            ' If a token starts with "re:" it is considered to be a regex.'),
-            epilog=('Example: histsearch monitoring "re:^salt\s+[\\"\']\*'
+            ' If a token starts with "r:" it is considered to be a regex.'),
+            epilog=('Example: histsearch monitoring "r:^salt\s+[\\"\']\*'
             '[\\"\']\s+state.apply"'))
     parser.add_argument("-a", "--include-all", action="store_true",
         help="include all own user histories (not only current user)")
@@ -139,7 +143,10 @@ def main():
         help="only search timespan days into the past (2w, 5d, 3h, 35m)")
     parser.add_argument("-w", "--with-time", action="store_true",
         help="also output execution time (in local timezone)")
-    args, searchterms = parser.parse_known_args()
+    return parser.parse_known_args()
+
+def main():
+    args, searchterms = parse_args()
     data = load_data(args.include_all, args.include_original)
     if args.deduplicate:
         data = dedup_entries(data)
@@ -148,7 +155,7 @@ def main():
     data = filter_entries(data, searchterms)
     data = data_to_list(data, args.sort)
     for entry in data:
-        if args.with_time: 
+        if args.with_time:
             ts = datetime.fromtimestamp(entry[1], tz=LOCAL_TIMEZONE)
             print("{0}   {1}".format(ts.strftime(
                 "%a %d/%m/%y %H:%M:%S"), entry[0]))
